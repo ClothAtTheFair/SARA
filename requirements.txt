@@ -1,0 +1,9 @@
+ecapture
+twilio
+SpeechRecognition
+pyttsx3
+wolframalpha
+beautifulsoup4
+wikipedia
+pyowm
+youtube_dl
