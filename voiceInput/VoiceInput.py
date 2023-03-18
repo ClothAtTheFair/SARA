@@ -4,7 +4,7 @@ import speech_recognition as sr
 import whisper
 import numpy as np
 from pydub import AudioSegment
-
+import redis
 
 class VoiceInput:
     def __init__(self):
@@ -18,7 +18,11 @@ class VoiceInput:
         dynamic_energy = mic_config['mic']['dynamic_energy']
         pause = mic_config['mic']['pause']
         save_file = mic_config['mic']['save_file']
-        self.result_queue = queue.Queue()
+        self.redis_instance = redis.Redis(
+            host='127.0.0.1',
+            port=6379,
+            decode_responses=True
+        )
 
         self.main(model, english, verbose, energy, pause, dynamic_energy, save_file)
 
@@ -34,8 +38,8 @@ class VoiceInput:
         threading.Thread(target=self.transcribe_forever,
                         args=(audio_queue, audio_model, english, verbose, save_file)).start()
 
-        while True:
-            print(self.result_queue.get())
+        # while True:
+        #     print(self.result_queue.get())
 
     def record_audio(self, audio_queue, energy, pause, dynamic_energy, save_file, temp_dir):
         #load the speech recognizer and set the initial energy threshold and pause threshold
@@ -74,17 +78,20 @@ class VoiceInput:
 
             if not verbose:
                 predicted_text = result["text"]
-                self.result_queue.put_nowait("You said: " + predicted_text)
-            else:
-                self.result_queue.put_nowait(result)
+                print("You said: " + predicted_text)
+            self.publish_latest_result(predicted_text)
 
             if save_file:
                 os.remove(audio_data)
 
-    def get_result_queue(self):
-        return self.result_queue
+    # def get_result_queue(self):
+    #     return self.result_queue
     
-    def get_result_queue_latest(self):
-        return self.result_queue.get()
+    # def get_result_queue_latest(self):
+    #     return self.result_queue.get()
+
+    def publish_latest_result(self, result):
+        print(result)
+        self.redis_instance.publish("voice-input", result)
 
 VoiceInput()
