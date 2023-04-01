@@ -79,7 +79,21 @@ class VoiceInput:
             if not verbose:
                 predicted_text = result["text"]
                 print("You said: " + predicted_text)
-            self.publish_latest_result(predicted_text)
+            #TODO: Create this as a utility function which is imported into functions
+            #TODO: Separate this into another threaded process to adhere to clean code
+            predicted_text = predicted_text.lower()
+            if 'sara' in predicted_text:
+                substring = 'sara'
+                str_list = predicted_text.split(substring)
+                output_string = "".join(str_list)
+                self.publish_latest_result(output_string)
+            elif 'sarah' in predicted_text:
+                substring = 'sarah'
+                str_list = predicted_text.split(substring)
+                output_string = "".join(str_list)
+                self.publish_latest_result(output_string)
+            else:
+                pass
 
             if save_file:
                 os.remove(audio_data)
