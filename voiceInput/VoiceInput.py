@@ -78,7 +78,7 @@ class VoiceInput:
 
             if not verbose:
                 predicted_text = result["text"]
-                print("You said: " + predicted_text)
+                # print("You said: " + predicted_text)
             #TODO: Create this as a utility function which is imported into functions
             #TODO: Separate this into another threaded process to adhere to clean code
             predicted_text = predicted_text.lower()
